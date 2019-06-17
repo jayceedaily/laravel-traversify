@@ -9,5 +9,6 @@
             "email": "alohajaycee@gmail.com"
         }
     ],
-    "require": {}
+    "require": {},
+    "minimum-stability": "dev"
 }

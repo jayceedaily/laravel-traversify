@@ -139,7 +139,7 @@
  * Important: All features can be nested with one another, unless if conflicting request.
  * ---------------------------------------------------------------------------------------
  */
-namespace App\Helpers;
+namespace alohajaycee;
 
 trait Traversify
 {
