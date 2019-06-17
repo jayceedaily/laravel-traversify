@@ -76,7 +76,7 @@ use Traversify/Traversify;
     
     	use Traversify;
     
-        public static $orderable = ['created_at', 'is_active']
+        public static $orderables = ['created_at', 'is_active']
     }
 ```
 ### Range
@@ -89,7 +89,7 @@ use Traversify/Traversify;
     
     	use Traversify;
     
-        public static $rangable = ['created_at', 'price']
+        public static $rangables = ['created_at', 'price']
     }
 ```
 ### Custom
@@ -99,14 +99,14 @@ use MyModel;
 
 class MyController {
 
-	public function index()
-    {
-    	return MyModel::traversify(function($q){
-        
-        	$q->where('is_active', TRUE);
-       
-        });
-    }
+     public function index()
+     {
+          return MyModel::traversify(function($q){
+               
+               $q->where('is_active', TRUE);
+               
+          });
+     }
 }
 
 ```
