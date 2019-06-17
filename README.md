@@ -1,6 +1,5 @@
 # Traversify [Work-in-Progress]
-[![Latest Version](https://img.shields.io/github/release/spatie/laravel-medialibrary.svg?style=flat-square)](https://github.com/alohajaycee/laravel-traversify/releases)
-[![Total Downloads](https://img.shields.io/packagist/dt/spatie/laravel-medialibrary.svg?style=flat-square)](https://packagist.org/packages/alohajaycee/laravel-traversify)
+https://img.shields.io/packagist/v/alohajaycee/laravel-traversify.svg
 ## Installation
 **Composer**
 
