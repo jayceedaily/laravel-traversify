@@ -1,5 +1,5 @@
 # Traversify [Work-in-Progress]
-https://img.shields.io/packagist/v/alohajaycee/laravel-traversify.svg
+[![Total Downloads](https://img.shields.io/packagist/v/alohajaycee/laravel-traversify.svg)](https://packagist.org/packages/alohajaycee/laravel-traversify)
 ## Installation
 **Composer**
 
