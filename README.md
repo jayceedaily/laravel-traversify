@@ -10,7 +10,7 @@ selected Fields.
 2. Add service providers
 
 
-###Change Log:
+### Change Log:
 
 2019-06-17
 
@@ -37,7 +37,7 @@ selected Fields.
 ### Pre-requisites:
 
 * **public static $searchables** = ['x', 'y', 'z', ...];
-* **public static $filterables ** = ['x', 'y', 'z', ...];
+* **public static $filterables** = ['x', 'y', 'z', ...];
 * **public static $orderables** = ['x', 'y', 'z', ...];
 * **public static $rangables** = ['x', 'y', 'z', ...];
 
@@ -47,7 +47,7 @@ How to use:
 
 Example:
 ```php
-use App\Helpers\Traversify;
+use Traversify\Traversify;
 
 class MyModel {
 
@@ -64,7 +64,7 @@ public static $rangables    = [...];
 
 -------------------------------------------------------------------------
 2.) Traverse your Model in your Controller
-
+```php
 Example:
 ``
 public function index(){
@@ -83,7 +83,7 @@ $data = (new MyModel)->traverse();
 // Your code goes here... 
 
 }
-
+```
 -------------------------------------------------------------------------
 Features:
 --------------------------------------------------------------------------
