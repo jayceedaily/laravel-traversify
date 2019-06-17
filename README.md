@@ -1,4 +1,4 @@
-# Traversify
+# Traversify (Work in Progress)
 
 Documentation:
 Traversify uses query string in all of its transaction and requires
