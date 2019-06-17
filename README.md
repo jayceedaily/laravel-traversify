@@ -8,6 +8,7 @@ Install via composer using ``composer requrie alohajaycee/laravel-traversify``
 
 ```php
 use Traversify/Traversify;
+
 use Eloquent;
 
 class MyClass extends Eloquent {
@@ -22,11 +23,11 @@ use MyModel
 
 class MyController {
 
-	public function index() {
-    
-    	MyModel::traversify();
-        
-    }
+     public function index() {
+
+          return MyModel::traversify();
+
+     }
 }
 ```
 
