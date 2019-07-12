@@ -1,4 +1,4 @@
-# Traversify [Work-in-Progress]
+# Traversify
 [![Total Downloads](https://img.shields.io/packagist/v/alohajaycee/laravel-traversify.svg)](https://packagist.org/packages/alohajaycee/laravel-traversify)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/alohajaycee/laravel-traversify/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/alohajaycee/laravel-traversify/?branch=master)
 ## Installation
