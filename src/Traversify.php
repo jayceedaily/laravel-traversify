@@ -19,7 +19,7 @@ trait Traversify
     public      $limit;     # Limit show - Paginate Prerequesit ()
 
     public      $expose;    # Returns all data (Uses get instead of paginate)
-    
+
     public      $debug;     # For testing;
 
     private     $query;     # Query builder
@@ -36,7 +36,7 @@ trait Traversify
     public function traverse($custom = NULL)
     {
         $custom && $this->custom = $custom;
-    
+
         $this->__getters();
 
         \DB::enableQueryLog();
@@ -54,15 +54,24 @@ trait Traversify
         endif;
     }
 
+    public static function setTraverseLimit($limitNo)
+    {
+        $traversify         = new self;
+
+        $traversify->limit  = $limitNo;
+
+        return $traversify;
+    }
+
     private function __queryBuilder()
     {
         $this->query = $this->query();
-        
+
         $queries = ['Search','Filter','Range', 'Order', 'Custom'];
 
         self::loader($queries,'__query');
-       
-        return ($this->expose || $this->take) ? ['data' => $this->query->take($this->take)->get()] : $this->query->latest()->paginate($this->limit);
+
+        return ($this->expose || $this->take) ? ['data' => $this->query->take($this->take)->get()] : $this->query->paginate($this->limit);
     }
 
     private function __queryCustom()
@@ -79,17 +88,17 @@ trait Traversify
         $this->query->where( function($query)
         {
             foreach(self::$searchables ?: [] as $searchable):
-                
+
                 $_searchable = explode('~',$searchable);
 
                 if(count($_searchable)>1):
-                    
+
                     $query->with($_searchable[0])->orWhereHas($_searchable[0], function($query) use ( $_searchable )
                       {
-                          $query->where($_searchable[1],'LIKE','%'.$this->search.'%');    
+                          $query->where($_searchable[1],'LIKE','%'.$this->search.'%');
                       });
                   else:
-                      $query->orWhere($searchable,'LIKE','%'.$this->search.'%');     
+                      $query->orWhere($searchable,'LIKE','%'.$this->search.'%');
                   endif;
 
             endforeach;
@@ -99,7 +108,7 @@ trait Traversify
     private function __queryFilter()
     {
         if(!isset(self::$filterables)) return;
-        
+
         $this->query->where(function($query)
         {
             foreach($this->filter ?: [] as $attribute => $value):
@@ -120,42 +129,42 @@ trait Traversify
 
                             $query->with($relationship[0])->whereHas($relationship[0],function($query) use ( $relationship, $values)
                             {
-                                $query->whereNotIn($relationship[1],$values);                                    
+                                $query->whereNotIn($relationship[1],$values);
                             });
 
                         else:
-                
+
                             $values = explode(',',$value);
 
                             $query->with($relationship[0])->whereHas($relationship[0],function($query) use ( $relationship, $values, $value)
                             {
-                                count($values) > 1 ? $query->whereIn($relationship[1],$values) : $query->where($relationship[1],$value);                            
+                                count($values) > 1 ? $query->whereIn($relationship[1],$values) : $query->where($relationship[1],$value);
                             });
-                            
+
                         endif;
 
                     else:
                         if($value[0]=='!'):
 
                             $values = explode(',',substr($value,1));
-        
+
                             $query->where(function($query) use ($attribute, $values)
                             {
                                 $query->whereNotIn($attribute,$values);
                             });
-                            
+
                         else:
-                
+
                             $values = explode(',',$value);
-                            
+
                             count($values) > 1 ? $query->whereIn($attribute,$values) : $query->where($attribute,$value);
-    
+
                         endif;
 
                     endif;
 
                 endif;
-    
+
             endforeach;
         });
     }
@@ -180,18 +189,18 @@ trait Traversify
 
                             $query->with($relationship[0])->whereHas($relationship[0],function($query) use ( $relationship, $values)
                             {
-                                $query->whereNotBetween($relationship[1],$values);                                    
+                                $query->whereNotBetween($relationship[1],$values);
                             });
 
                         else:
-                
+
                             $values = explode(',',$value);
 
                             $query->with($relationship[0])->whereHas($relationship[0],function($query) use ( $relationship, $values, $value)
                             {
-                               $query->whereBetween($relationship[1],$values);                            
+                               $query->whereBetween($relationship[1],$values);
                             });
-                            
+
                         endif;
 
                     else:
@@ -199,18 +208,18 @@ trait Traversify
                         if($value[0]=='!'):
 
                             $values = explode(',',substr($value,1));
-        
+
                             $query->where(function($q) use ($attribute, $values)
                             {
                                 $q->whereNotBetween($attribute,$values);
                             });
-                            
+
                         else:
 
                             $values = explode(',',$value);
-        
+
                             $query->whereBetween($attribute,$values);
-        
+
                         endif;
 
                     endif;
@@ -228,14 +237,14 @@ trait Traversify
         foreach($this->order ?: [] as $attribute => $value):
 
             if(in_array($attribute, self::$orderables)):
-                
+
                 $relationship = explode('~', $attribute);
 
                 if(count($relationship) == 2):
-                   
+
                     $this->query->with([$relationship[0] => function($query) use ( $relationship, $value)
                     {
-                        $query->orderBy($relationship[1],$value); 
+                        $query->orderBy($relationship[1],$value);
                     }]);
 
                 else:
@@ -243,7 +252,7 @@ trait Traversify
                     $this->query->orderBy($attribute, $value);
 
                 endif;
-                
+
             endif;
 
         endforeach;
@@ -251,15 +260,17 @@ trait Traversify
 
     private function __getters ( $getters = ['search', 'filter', 'take', 'order', 'range', 'limit', 'expose', 'debug'] )
     {
-        foreach($getters as $getter):
-            !$this->$getter && $this->$getter = request()->get($getter);
-        endforeach;
+        foreach($getters as $getter)
+
+            if(request()->has($getter))
+
+                $this->$getter = request()->get($getter);
     }
 
     private function loader($loads, $prefix = '__')
     {
         foreach($loads as $load):
-            
+
             self::{$prefix.$load}();
 
         endforeach;
