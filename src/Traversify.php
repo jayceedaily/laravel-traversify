@@ -71,7 +71,17 @@ trait Traversify
 
         self::loader($queries,'__query');
 
-        return ($this->expose || $this->take) ? ['data' => $this->query->take($this->take)->get()] : $this->query->paginate($this->limit);
+        // return ($this->expose || $this->take) ? ['data' => $this->query->take($this->take)->get()] : $this->query->paginate($this->limit);
+
+        if($this->expose || $this->take) {
+
+            return ['data' => $this->query->take($this->take)->get()];
+
+        } else {
+
+            return $this->query->latest()->paginate($this->limit);
+
+        }
     }
 
     private function __queryCustom()
