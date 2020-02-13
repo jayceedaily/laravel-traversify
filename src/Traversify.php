@@ -71,8 +71,6 @@ trait Traversify
 
         self::loader($queries,'__query');
 
-        // return ($this->expose || $this->take) ? ['data' => $this->query->take($this->take)->get()] : $this->query->paginate($this->limit);
-
         if($this->expose || $this->take) {
 
             return ['data' => $this->query->take($this->take)->get()];
@@ -93,7 +91,7 @@ trait Traversify
 
     private function __querySearch()
     {
-        if(!isset(self::$searchables)) return;
+        if(!isset(self::$searchables) || is_null($this->search)) return;
 
         $this->query->where( function($query)
         {
