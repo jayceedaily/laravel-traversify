@@ -93,7 +93,9 @@ trait Traversify
     {
         if(!isset(self::$searchables) || is_null($this->search)) return;
 
-        $this->query->where( function($query)
+        $keywords = explode(' ', $this->search);
+
+        $this->query->where( function($query) use ($keywords)
         {
             foreach(self::$searchables ?: [] as $searchable):
 
@@ -101,12 +103,21 @@ trait Traversify
 
                 if(count($_searchable)>1):
 
-                    $query->with($_searchable[0])->orWhereHas($_searchable[0], function($query) use ( $_searchable )
+                    $query->with($_searchable[0])->orWhereHas($_searchable[0], function($query) use ( $_searchable, $keywords)
                       {
-                          $query->where($_searchable[1],'LIKE','%'.$this->search.'%');
+                            foreach($keywords as $keyword):
+
+                                $query->orWhere($_searchable[1],'LIKE','%'.$keyword.'%');
+                            endforeach;
+
                       });
                   else:
-                      $query->orWhere($searchable,'LIKE','%'.$this->search.'%');
+
+					foreach($keywords as $keyword):
+
+                        $query->orWhere($searchable,'LIKE','%'.$keyword.'%');
+                    endforeach;
+
                   endif;
 
             endforeach;
