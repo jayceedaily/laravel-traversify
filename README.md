@@ -35,7 +35,7 @@ class MyController {
 
 ## Configure
 To use a search like function, you must create a static variables and assign an array containing an array of the fields that needed to be searched. These are the following:
-* $searchbales
+* $searchables
 * $filterables
 * $orderables
 * $rangables
