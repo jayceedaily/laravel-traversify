@@ -73,7 +73,7 @@ trait Traversify
 
         if($this->expose || $this->take) {
 
-            return ['data' => $this->query->take($this->take)->get()];
+            return $this->query->take($this->take)->get();
 
         } else {
 
@@ -132,7 +132,9 @@ trait Traversify
         {
             foreach($this->filter ?: [] as $attribute => $value):
 
-                $value == 'null' && $value = null;
+                // $value == 'null' && $value = null;
+
+                if(empty($value)) continue;
 
                 if(in_array($attribute, self::$filterables)):
 
