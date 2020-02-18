@@ -73,13 +73,18 @@ trait Traversify
 
         if($this->expose || $this->take) {
 
-            return $this->query->take($this->take)->get();
+            $result = $this->query->take($this->take)->get();
 
         } else {
 
-            return $this->query->latest()->paginate($this->limit);
+            $result = $this->query->latest()->paginate($this->limit);
 
         }
+
+        if(isset(self::$eagerLoad)) $result->load(self::$eagerLoad);
+
+        return $result;
+
     }
 
     private function __queryCustom()
