@@ -108,12 +108,19 @@ trait Traversify
 
                 if(count($_searchable)>1):
 
-                    $query->with($_searchable[0])->orWhereHas($_searchable[0], function($query) use ( $_searchable, $keywords)
+                    $query->with($_searchable[0])->OrWhereHas($_searchable[0], function($query) use ( $_searchable, $keywords)
                       {
-                            foreach($keywords as $keyword):
 
-                                $query->orWhere($_searchable[1],'LIKE','%'.$keyword.'%');
-                            endforeach;
+                            $query->Where(function($q) use ($keywords, $_searchable){
+
+                                $q->where($_searchable[1],'LIKE','%'.implode(' ',$keywords).'%');
+
+
+                                foreach($keywords as $keyword):
+
+                                    $q->orWhere($_searchable[1],'LIKE','%'.$keyword.'%');
+                                endforeach;
+                            });
 
                       });
                   else:
