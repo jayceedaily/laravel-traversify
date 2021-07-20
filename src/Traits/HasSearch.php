@@ -24,15 +24,15 @@ trait HasSearch
      */
     public function scopeSearch(Builder $query, String $keyword = '')
     {
-        if(!$this->traversify['search']) {
+        if (!$searches = $this->traversify['search']) {
             throw new Exception('No column configured to be searched');
         }
 
-        if(empty($keyword)) {
+        if (empty($keyword)) {
             return;
         }
 
-        foreach($this->traversify['search'] as $searchable) {
+        foreach($searches as $searchable) {
 
             if($this->hasSearchRelationshipDriver == 'PowerJoins') {
 
@@ -55,7 +55,7 @@ trait HasSearch
 
         $searchColumn = array_pop($searchables);
 
-        if(count($searchables) >= 1) {
+        if (count($searchables) >= 1) {
 
             $query->leftJoinRelationship(implode('.',$searchables));
 
@@ -107,7 +107,7 @@ trait HasSearch
     {
         $searchColumn = array_shift($searchable);
 
-        if(count($searchable)) {
+        if (count($searchable)) {
 
             $query->orWhereHas($searchColumn, function($_query) use ($searchable, $keyword) {
 
@@ -142,7 +142,7 @@ trait HasSearch
      */
     public function scopeSetSearchable(Builder $query, Mixed $params)
     {
-        if(!is_array($params)) {
+        if (!is_array($params)) {
             $params = [$params];
         }
 
