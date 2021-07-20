@@ -4,14 +4,14 @@ namespace Traversify;
 
 use Traversify\Traits\HasSort;
 use Traversify\Traits\HasRange;
-use Traversify\Traits\HasLoader;
+use Traversify\Traits\HasSearch;
 use Traversify\Traits\HasFilters;
-use Traversify\Traits\HasSearchable;
+use Traversify\Traits\HasAutoload;
 use Illuminate\Database\Eloquent\Builder;
 
 trait Traversify
 {
-    use HasFilters, HasRange, HasSearchable, HasSort, HasLoader;
+    use HasFilters, HasRange, HasSearch, HasSort, HasAutoload;
 
     /**
      * All-in-one solution to create indexed endpoints fast
@@ -45,7 +45,7 @@ trait Traversify
         if( $request->has('load') &&
             is_array($request->load)) {
 
-            $query->loader($request->load);
+            $query->autoload($request->load);
         }
 
         return $query;
