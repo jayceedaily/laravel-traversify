@@ -4,7 +4,7 @@
 ## Installation
 **Composer**
 
-Install via composer using ``composer require alohajaycee/laravel-traversify``
+Install via composer using ``composer require jayceedaily/laravel-traversify``
 
 **Model setup**
 
