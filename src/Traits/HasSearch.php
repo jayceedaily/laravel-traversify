@@ -59,30 +59,23 @@ trait HasSearch
 
             $tableName = $this->$relationshipTable()->getRelated()->getTable();
 
-            $query->orWhere("$tableName.$searchColumn", 'LIKE', "%$keyword%");
-
             $keywords = explode(" ", $keyword);
 
             foreach ($keywords as $_keyword) {
 
-                $query->orWhere("$tableName.$searchColumn", 'LIKE', "%$_keyword" );
-
-                $query->orWhere("$tableName.$searchColumn", 'LIKE', "$_keyword%" );
+                $query->orWhere("$tableName.$searchColumn", 'LIKE', "%$_keyword%" );
             }
 
         } else {
 
             $tableName = $this->getTable();
 
-            $query->orWhere("$tableName.$searchColumn", 'LIKE', "%$keyword%");
-
             $keywords = explode(" ", $keyword);
 
             foreach ($keywords as $_keyword) {
 
-                $query->orWhere("$tableName.$searchColumn", 'LIKE', "%$_keyword" );
+                $query->orWhere("$tableName.$searchColumn", 'LIKE', "%$_keyword%" );
 
-                $query->orWhere("$tableName.$searchColumn", 'LIKE', "$_keyword%" );
             }
         }
 
@@ -121,9 +114,8 @@ trait HasSearch
 
                 foreach ($keywords as $_keyword) {
 
-                    $_query->orWhere($searchColumn, 'LIKE', "%$_keyword" );
+                    $_query->orWhere($searchColumn, 'LIKE', "%$_keyword%" );
 
-                    $_query->orWhere($searchColumn, 'LIKE', "$_keyword%" );
                 }
             });
         }
