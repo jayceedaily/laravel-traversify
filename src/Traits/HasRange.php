@@ -33,10 +33,9 @@ trait HasRange
 
             if(in_array($rangeable, array_keys($range))) {
 
-                $rangeables = explode('.', $rangeable);
-
-
                 if ($this->hasRangeRelationshipDriver == 'Eloquent') {
+
+                    $rangeables = explode('.', $rangeable);
 
                     $this->createRangeQuery($query, $rangeables, $range[$rangeable]);
                 }
