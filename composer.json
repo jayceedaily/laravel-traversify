@@ -5,11 +5,13 @@
     "license": "MIT",
     "authors": [
         {
-            "name": "Jaycee Mariano",
-            "email": "alohajaycee@gmail.com"
+            "name": "Jaycee Daily",
+            "email": "jayceedaily@gmail.com"
         }
     ],
-    "require": {},
+    "require": {
+        "kirschbaum-development/eloquent-power-joins": "dev-master"
+    },
     "minimum-stability": "dev",
     "autoload": {
         "psr-4": {

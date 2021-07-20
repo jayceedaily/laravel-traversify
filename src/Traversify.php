@@ -2,310 +2,52 @@
 
 namespace Traversify;
 
+use Traversify\Traits\HasSort;
+use Traversify\Traits\HasRange;
+use Traversify\Traits\HasLoader;
+use Traversify\Traits\HasFilters;
+use Traversify\Traits\HasSearchable;
+use Illuminate\Database\Eloquent\Builder;
+
 trait Traversify
 {
-    public      $search;    # Search keyword (String)
+    use HasFilters, HasRange, HasSearchable, HasSort, HasLoader;
 
-    public      $filter;    # Query filters (Array)
-
-    public      $custom;     # Custom queries
-
-    public      $take;      # For limited show (Integer)
-
-    public      $order;     # Order of list (Array)
-
-    public      $range;     # Range of query (Array)
-
-    public      $limit;     # Limit show - Paginate Prerequesit ()
-
-    public      $expose;    # Returns all data (Uses get instead of paginate)
-
-    public      $debug;     # For testing;
-
-    private     $query;     # Query builder
-
-
-    public static function traversify($custom = NULL)
+    /**
+     * All-in-one solution to create indexed endpoints fast
+     * Out of the box support:
+     * Search, sort, filter, load, range
+     *
+     * @param mixed $query
+     * @param mixed $request
+     * @return mixed
+     */
+    public function scopeTraversify(Builder $query, $request)
     {
-        $_traverse = new self;
+        if( $request->has('search') &&
+            is_string($request->search)) {
 
-        return $_traverse->traverse($custom);
-    }
-
-
-    public function traverse($custom = NULL)
-    {
-        $custom && $this->custom = $custom;
-
-        $this->__getters();
-
-        \DB::enableQueryLog();
-
-        $result = $this->__queryBuilder();
-
-        if($this->debug && env('APP_DEBUG')):
-
-            return \DB::getQueryLog();
-
-        else:
-
-            return $result;
-
-        endif;
-    }
-
-    public static function setTraverseLimit($limitNo)
-    {
-        $traversify         = new self;
-
-        $traversify->limit  = $limitNo;
-
-        return $traversify;
-    }
-
-    private function __queryBuilder()
-    {
-        $this->query = $this->query();
-
-        $queries = ['Search','Filter','Range', 'Order', 'Custom'];
-
-        self::loader($queries,'__query');
-
-        if($this->expose || $this->take) {
-
-            $result = $this->query->take($this->take)->get();
-
-        } else {
-
-            $result = $this->query->latest()->paginate($this->limit);
-
+            $query->search($request->search);
         }
 
-        if(isset(self::$eagerLoad)) $result->load(self::$eagerLoad);
+        if( $request->has('filter') &&
+            is_array($request->filter)) {
 
-        return $result;
+            $query->filter($request->filter);
+        }
 
-    }
+        if( $request->has('sort') &&
+            is_array($request->sort)) {
 
-    private function __queryCustom()
-    {
-        if(!isset($this->custom)) return;
+            $query->sort($request->sort);
+        }
 
-        $this->query->where($this->custom);
-    }
+        if( $request->has('load') &&
+            is_array($request->load)) {
 
-    private function __querySearch()
-    {
-        if(!isset(self::$searchables) || is_null($this->search)) return;
+            $query->loader($request->load);
+        }
 
-        $keywords = explode(' ', $this->search);
-
-        $this->query->where( function($query) use ($keywords)
-        {
-            foreach(self::$searchables ?: [] as $searchable):
-
-                $_searchable = explode('~',$searchable);
-
-                if(count($_searchable)>1):
-
-                    $query->with($_searchable[0])->OrWhereHas($_searchable[0], function($query) use ( $_searchable, $keywords)
-                      {
-
-                            $query->Where(function($q) use ($keywords, $_searchable){
-
-                                $q->where($_searchable[1],'LIKE','%'.implode(' ',$keywords).'%');
-
-
-                                foreach($keywords as $keyword):
-
-                                    $q->orWhere($_searchable[1],'LIKE','%'.$keyword.'%');
-                                endforeach;
-                            });
-
-                      });
-                  else:
-
-					foreach($keywords as $keyword):
-
-                        $query->orWhere($searchable,'LIKE','%'.$keyword.'%');
-                    endforeach;
-
-                  endif;
-
-            endforeach;
-        });
-    }
-
-    private function __queryFilter()
-    {
-        if(!isset(self::$filterables)) return;
-
-        $this->query->where(function($query)
-        {
-            foreach($this->filter ?: [] as $attribute => $value):
-
-                // $value == 'null' && $value = null;
-
-                if(empty($value)) continue;
-
-                if(in_array($attribute, self::$filterables)):
-
-                    $relationship = explode('~', $attribute);
-
-                    if(count($relationship) == 2):
-
-                        if($value[0]=='!'):
-
-                            $values = explode(',',substr($value,1));
-
-                            $value == 'null' && $value = null;
-
-                            $query->with($relationship[0])->whereHas($relationship[0],function($query) use ( $relationship, $values)
-                            {
-                                $query->whereNotIn($relationship[1],$values);
-                            });
-
-                        else:
-
-                            $values = explode(',',$value);
-
-                            $query->with($relationship[0])->whereHas($relationship[0],function($query) use ( $relationship, $values, $value)
-                            {
-                                count($values) > 1 ? $query->whereIn($relationship[1],$values) : $query->where($relationship[1],$value);
-                            });
-
-                        endif;
-
-                    else:
-                        if($value[0]=='!'):
-
-                            $values = explode(',',substr($value,1));
-
-                            $query->where(function($query) use ($attribute, $values)
-                            {
-                                $query->whereNotIn($attribute,$values);
-                            });
-
-                        else:
-
-                            $values = explode(',',$value);
-
-                            count($values) > 1 ? $query->whereIn($attribute,$values) : $query->where($attribute,$value);
-
-                        endif;
-
-                    endif;
-
-                endif;
-
-            endforeach;
-        });
-    }
-
-    private function __queryRange()
-    {
-        if(!isset(self::$rangables)) return;
-
-        $this->query->where(function($query)
-        {
-            foreach($this->range ?: [] as $attribute => $value):
-
-                if(in_array($attribute, self::$rangables)):
-
-                    $relationship = explode('~', $attribute);
-
-                    if(count($relationship) == 2):
-
-                        if($value[0]=='!'):
-
-                            $values = explode(',',substr($value,1));
-
-                            $query->with($relationship[0])->whereHas($relationship[0],function($query) use ( $relationship, $values)
-                            {
-                                $query->whereNotBetween($relationship[1],$values);
-                            });
-
-                        else:
-
-                            $values = explode(',',$value);
-
-                            $query->with($relationship[0])->whereHas($relationship[0],function($query) use ( $relationship, $values, $value)
-                            {
-                               $query->whereBetween($relationship[1],$values);
-                            });
-
-                        endif;
-
-                    else:
-
-                        if($value[0]=='!'):
-
-                            $values = explode(',',substr($value,1));
-
-                            $query->where(function($q) use ($attribute, $values)
-                            {
-                                $q->whereNotBetween($attribute,$values);
-                            });
-
-                        else:
-
-                            $values = explode(',',$value);
-
-                            $query->whereBetween($attribute,$values);
-
-                        endif;
-
-                    endif;
-
-                endif;
-
-            endforeach;
-        });
-    }
-
-    private function __queryOrder()
-    {
-        if(!isset(self::$orderables)) return;
-
-        foreach($this->order ?: [] as $attribute => $value):
-
-            if(in_array($attribute, self::$orderables)):
-
-                $relationship = explode('~', $attribute);
-
-                if(count($relationship) == 2):
-
-                    $this->query->with([$relationship[0] => function($query) use ( $relationship, $value)
-                    {
-                        $query->orderBy($relationship[1],$value);
-                    }]);
-
-                else:
-
-                    $this->query->orderBy($attribute, $value);
-
-                endif;
-
-            endif;
-
-        endforeach;
-    }
-
-    private function __getters ( $getters = ['search', 'filter', 'take', 'order', 'range', 'limit', 'expose', 'debug'] )
-    {
-        foreach($getters as $getter)
-
-            if(request()->has($getter))
-
-                $this->$getter = request()->get($getter);
-    }
-
-    private function loader($loads, $prefix = '__')
-    {
-        foreach($loads as $load):
-
-            self::{$prefix.$load}();
-
-        endforeach;
+        return $query;
     }
 }
