@@ -1,12 +1,15 @@
 <?php
 namespace Traversify\Traits;
 
-use Illuminate\Database\Eloquent\Builder;
+use Exception;
 use RuntimeException;
 use InvalidArgumentException;
+use Illuminate\Database\Eloquent\Builder;
 
 trait HasRange
 {
+    protected $hasRangeRelationshipDriver = 'Eloquent';
+
     /**
      * Initialize ranges
      *
@@ -18,18 +21,25 @@ trait HasRange
      */
     public function scopeRange(Builder $query, Array $range = [])
     {
-        if(!$this->range || !$range) {
+        if (! $ranges = $this->traversify['range']) {
+            throw new Exception('No column configured to be ranged');
+        }
 
+        if (empty($range)) {
             return;
         }
 
-        foreach($this->range as $rangeable) {
+        foreach($ranges as $rangeable) {
 
             if(in_array($rangeable, array_keys($range))) {
 
                 $rangeables = explode('.', $rangeable);
 
-                $this->createRangeQuery($query, $rangeables, $range[$rangeable]);
+
+                if ($this->hasRangeRelationshipDriver == 'Eloquent') {
+
+                    $this->createRangeQuery($query, $rangeables, $range[$rangeable]);
+                }
             }
         }
     }
@@ -44,7 +54,7 @@ trait HasRange
      * @throws RuntimeException
      * @throws InvalidArgumentException
      */
-    private function createRangeQuery(Builder $query, Array $rangeables, String $value)
+    private function createRangeQuery(Builder $query, Array $rangeables, Array $value)
     {
         $rangeColumn = array_shift($rangeables);
 
@@ -57,7 +67,7 @@ trait HasRange
 
         } else {
 
-            $query->where($rangeColumn, $value);
+            $query->whereBetween($rangeColumn, $value);
         }
     }
 }
