@@ -1,12 +1,15 @@
 <?php
 namespace Traversify\Traits;
 
-use Illuminate\Database\Eloquent\Builder;
+use Exception;
 use RuntimeException;
 use InvalidArgumentException;
+use Illuminate\Database\Eloquent\Builder;
 
 trait HasFilters
 {
+    protected $hasFilterRelationshipDriver = 'Eloquent';
+
     /**
      * Initialize filters
      *
@@ -18,18 +21,25 @@ trait HasFilters
      */
     public function scopeFilter(Builder $query, Array $filter = [])
     {
-        if(!$this->filters || !$filter) {
+        if (!$filters = $this->traversify['filters']) {
+            throw new Exception('No column configured to be filtered');
+        }
 
+        if (empty($filter)) {
             return;
         }
 
-        foreach($this->filters as $filterable) {
+        foreach($filters as $filterable) {
 
             if(in_array($filterable, array_keys($filter))) {
 
-                $filterables = \explode('.', $filterable);
+                $filterables = explode('.', $filterable);
 
-                $this->createFilterQuery($query, $filterables, $filter[$filterable]);
+                if ($this->hasSortRelationshipDriver == 'Eloquent') {
+
+                    $this->createFilterQuery($query, $filterables, $filter[$filterable]);
+
+                }
             }
         }
     }
