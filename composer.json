@@ -9,13 +9,13 @@
             "email": "jayceedaily@gmail.com"
         }
     ],
-    "require": {
-        "kirschbaum-development/eloquent-power-joins": "dev-master"
-    },
     "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
             "Traversify\\": "src/"
         }
+    },
+    "require": {
+        "kirschbaum-development/eloquent-power-joins": "^2.4"
     }
 }

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "73cfad8389ef6438ab4165b9959d85b0",
+    "content-hash": "430a3a7fed1d1cbcd96ab2be6dccff7a",
     "packages": [
         {
             "name": "doctrine/inflector",
@@ -433,16 +433,16 @@
         },
         {
             "name": "kirschbaum-development/eloquent-power-joins",
-            "version": "dev-master",
+            "version": "2.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/kirschbaum-development/eloquent-power-joins.git",
-                "reference": "a2ba04a4146b3bcaca51f3cf273a72ea96b1c2b2"
+                "reference": "4837a42be7c335141bbeb1f9aec5d96a6986ea13"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/kirschbaum-development/eloquent-power-joins/zipball/a2ba04a4146b3bcaca51f3cf273a72ea96b1c2b2",
-                "reference": "a2ba04a4146b3bcaca51f3cf273a72ea96b1c2b2",
+                "url": "https://api.github.com/repos/kirschbaum-development/eloquent-power-joins/zipball/4837a42be7c335141bbeb1f9aec5d96a6986ea13",
+                "reference": "4837a42be7c335141bbeb1f9aec5d96a6986ea13",
                 "shasum": ""
             },
             "require": {
@@ -455,7 +455,6 @@
                 "orchestra/testbench": "4.*|5.*|6.*",
                 "phpunit/phpunit": "^8.0"
             },
-            "default-branch": true,
             "type": "library",
             "extra": {
                 "laravel": {
@@ -490,9 +489,9 @@
             ],
             "support": {
                 "issues": "https://github.com/kirschbaum-development/eloquent-power-joins/issues",
-                "source": "https://github.com/kirschbaum-development/eloquent-power-joins/tree/master"
+                "source": "https://github.com/kirschbaum-development/eloquent-power-joins/tree/2.4.0"
             },
-            "time": "2021-05-08T11:25:27+00:00"
+            "time": "2021-04-18T22:40:29+00:00"
         },
         {
             "name": "nesbot/carbon",
@@ -1764,9 +1763,7 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {
-        "kirschbaum-development/eloquent-power-joins": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],
