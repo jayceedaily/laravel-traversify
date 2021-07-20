@@ -9,8 +9,6 @@ use Illuminate\Database\Eloquent\Builder;
 
 trait HasSearch
 {
-    protected $hasSearchRelationshipDriver = 'PowerJoins';
-
     use PowerJoins;
 
     /**
@@ -34,13 +32,11 @@ trait HasSearch
 
         foreach($searches as $searchable) {
 
-            if($this->hasSearchRelationshipDriver == 'PowerJoins') {
+            if($this->hasSearchRelationshipDriver == 'PowerJoin') {
 
                 $this->createPowerJoinSearchQuery($query, $searchable, $keyword);
 
-            }
-
-            if($this->hasSearchRelationshipDriver == 'Eloquent') {
+            } else {
 
                 $searchables = explode('.', $searchable);
 

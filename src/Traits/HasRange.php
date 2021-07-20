@@ -8,8 +8,6 @@ use Illuminate\Database\Eloquent\Builder;
 
 trait HasRange
 {
-    protected $hasRangeRelationshipDriver = 'Eloquent';
-
     /**
      * Initialize ranges
      *
@@ -33,7 +31,11 @@ trait HasRange
 
             if(in_array($rangeable, array_keys($range))) {
 
-                if ($this->hasRangeRelationshipDriver == 'Eloquent') {
+                if ($this->hasRangeRelationshipDriver == 'PowerJoin') {
+
+                    throw new Exception('PowerJoin has not been implemented');
+
+                } else {
 
                     $rangeables = explode('.', $rangeable);
 

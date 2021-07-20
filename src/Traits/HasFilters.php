@@ -8,8 +8,6 @@ use Illuminate\Database\Eloquent\Builder;
 
 trait HasFilters
 {
-    protected $hasFilterRelationshipDriver = 'Eloquent';
-
     /**
      * Initialize filters
      *
@@ -35,7 +33,11 @@ trait HasFilters
 
                 $filterables = explode('.', $filterable);
 
-                if ($this->hasSortRelationshipDriver == 'Eloquent') {
+                if ($this->hasSortRelationshipDriver == 'PowerJoin') {
+
+                    throw new Exception('PowerJoin has not been implemented');
+
+                } else {
 
                     $this->createFilterQuery($query, $filterables, $filter[$filterable]);
 

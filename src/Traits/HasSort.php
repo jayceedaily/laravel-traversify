@@ -54,7 +54,7 @@ trait HasSort
 
                 else {
 
-                    $tableName = $this->getTable(); 
+                    $tableName = $this->getTable();
 
                     $query->orderBy("$tableName.$sortColumn", $sort[$sortable]);
                 }
