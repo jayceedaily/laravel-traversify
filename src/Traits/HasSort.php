@@ -24,7 +24,7 @@ trait HasSort
      */
     public function scopeSort(Builder $query, Array $sort = [])
     {
-        if(!$this->sort) {
+        if(!$sorts = $this->traversify['sort']) {
             throw new Exception("No column configured to be sorted");
         }
 
@@ -32,7 +32,7 @@ trait HasSort
             return;
         }
 
-        foreach($this->sort as $sortable) {
+        foreach($sorts as $sortable) {
 
             if (in_array($sortable, array_keys($sort))) {
 
