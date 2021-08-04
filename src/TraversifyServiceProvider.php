@@ -15,17 +15,16 @@ class TraversifyServiceProvider extends ServiceProvider
 
     public function boot()
     {
+        /**
+         * Use traversify via relationship chains
+         */
         Builder::macro('traversify', function($request){
 
             $model = $this->getModel();
 
-            $query = $this->getModel()::query();
-
             if($model instanceOf Traversable) {
 
-                Traversify::traverse($query, $request);
-
-                return $query;
+                return Traversify::traverse($this, $request);
             }
 
             throw new Exception($model::class . " does not implement traversify.");
