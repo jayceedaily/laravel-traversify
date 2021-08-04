@@ -24,6 +24,11 @@ trait Traversify
      */
     public function scopeTraversify(Builder $query, $request)
     {
+        return self::traverse($query, $request);
+    }
+
+    public static function traverse(Builder $query, $request)
+    {
         if( $request->has('search') &&
             is_string($request->search)) {
 
@@ -42,10 +47,10 @@ trait Traversify
             $query->sort($request->sort);
         }
 
-        if( $request->has('load') &&
-            is_array($request->load)) {
+        if( $request->has('autoload') &&
+            is_array($request->autoload)) {
 
-            $query->autoload($request->load);
+            $query->autoload($request->autoload);
         }
 
         return $query;
