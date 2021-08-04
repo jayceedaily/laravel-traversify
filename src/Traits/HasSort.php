@@ -24,7 +24,7 @@ trait HasSort
      */
     public function scopeSort(Builder $query, Array $sort = [])
     {
-        if(!$sorts = $this->traversify['sort']) {
+        if(!$this->traversify || ($this->traversify && !$sorts = $this->traversify['sort'])) {
             throw new Exception("No column configured to be sorted");
         }
 

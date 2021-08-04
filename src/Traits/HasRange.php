@@ -19,7 +19,7 @@ trait HasRange
      */
     public function scopeRange(Builder $query, Array $range = [])
     {
-        if (! $ranges = $this->traversify['range']) {
+        if (!$this->traversify || ($this->traversify && !$ranges = $this->traversify['range'])) {
             throw new Exception('No column configured to be ranged');
         }
 

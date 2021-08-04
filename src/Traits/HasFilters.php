@@ -19,7 +19,7 @@ trait HasFilters
      */
     public function scopeFilter(Builder $query, Array $filter = [])
     {
-        if (!$filters = $this->traversify['filters']) {
+        if (!$this->traversify || ($this->traversify && !$filters = $this->traversify['filters'])) {
             throw new Exception('No column configured to be filtered');
         }
 

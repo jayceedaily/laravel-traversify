@@ -22,7 +22,7 @@ trait HasSearch
      */
     public function scopeSearch(Builder $query, String $keyword = '')
     {
-        if (!$searches = $this->traversify['search']) {
+        if (!$this->traversify || ($this->traversify && !$searches = $this->traversify['search'])) {
             throw new Exception('No column configured to be searched');
         }
 
