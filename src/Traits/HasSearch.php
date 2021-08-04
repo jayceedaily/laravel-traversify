@@ -30,19 +30,23 @@ trait HasSearch
             return;
         }
 
-        foreach($searches as $searchable) {
+        $query->where(function($query) use($searches, $keyword){
 
-            if($this->hasSearchRelationshipDriver == 'PowerJoin') {
+            foreach($searches as $searchable) {
 
-                $this->createPowerJoinSearchQuery($query, $searchable, $keyword);
+                if($this->hasSearchRelationshipDriver == 'PowerJoin') {
 
-            } else {
+                    $this->createPowerJoinSearchQuery($query, $searchable, $keyword);
 
-                $searchables = explode('.', $searchable);
+                } else {
 
-                $this->createEloquentSearchQuery($query, $searchables, $keyword );
+                    $searchables = explode('.', $searchable);
+
+                        $this->createEloquentSearchQuery($query, $searchables, $keyword );
+
+                }
             }
-        }
+        });
     }
 
     private function createPowerJoinSearchQuery(Builder $query, String $searchable, String $keyword)
@@ -73,7 +77,6 @@ trait HasSearch
             $keywords = explode(" ", $keyword);
 
             foreach ($keywords as $_keyword) {
-
                 $query->orWhere("$tableName.$searchColumn", 'LIKE', "%$_keyword%" );
 
             }
