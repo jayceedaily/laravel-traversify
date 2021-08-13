@@ -11,6 +11,8 @@ trait HasSearch
 {
     use PowerJoins;
 
+    protected $like = 'LIKE';
+
     /**
      * Initialize search query
      *
@@ -28,6 +30,13 @@ trait HasSearch
 
         if (empty($keyword)) {
             return;
+        }
+
+        $key = $this->connection ?: config('database.default');
+
+        if(config('database.connections.' . $key . '.driver') == 'pgsql') {
+
+            $this->like = 'ILIKE';
         }
 
         $query->where(function($query) use($searches, $keyword){
@@ -67,7 +76,7 @@ trait HasSearch
 
             foreach ($keywords as $_keyword) {
 
-                $query->orWhere("$tableName.$searchColumn", 'LIKE', "%$_keyword%" );
+                $query->orWhere("$tableName.$searchColumn", $this->like, "%$_keyword%" );
             }
 
         } else {
@@ -77,7 +86,7 @@ trait HasSearch
             $keywords = explode(" ", $keyword);
 
             foreach ($keywords as $_keyword) {
-                $query->orWhere("$tableName.$searchColumn", 'LIKE', "%$_keyword%" );
+                $query->orWhere("$tableName.$searchColumn", $this->like, "%$_keyword%" );
 
             }
         }
@@ -117,7 +126,8 @@ trait HasSearch
 
                 foreach ($keywords as $_keyword) {
 
-                    $_query->orWhere($searchColumn, 'LIKE', "%$_keyword%" );
+
+                    $_query->orWhere($searchColumn, $this->like, "%$_keyword%" );
 
                 }
             });
