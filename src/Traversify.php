@@ -47,6 +47,12 @@ trait Traversify
             $query->sort($request->sort);
         }
 
+        if( $request->has('range') &&
+            is_array($request->range)) {
+
+            $query->range($request->range);
+        }
+
         if( $request->has('autoload') &&
             is_array($request->autoload)) {
 
