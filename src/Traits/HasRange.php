@@ -19,7 +19,7 @@ trait HasRange
      */
     public function scopeRange(Builder $query, Array $range = [])
     {
-        if (!$this->traversify || ($this->traversify && !$ranges = $this->traversify['range'])) {
+        if (!$ranges = $this->range) {
             throw new Exception('No column configured to be ranged');
         }
 
@@ -31,44 +31,34 @@ trait HasRange
 
             if(in_array($rangeable, array_keys($range))) {
 
-                if ($this->hasRangeRelationshipDriver == 'PowerJoin') {
+                $rangeables = explode('.', $rangeable);
 
-                    throw new Exception('PowerJoin has not been implemented');
-
-                } else {
-
-                    $rangeables = explode('.', $rangeable);
-
-                    $this->createRangeQuery($query, $rangeables, $range[$rangeable]);
-                }
+                $this->createRangeQuery($query, $rangeables, $range[$rangeable]);
             }
         }
     }
 
-    /**
-     * Generate range query
-     *
-     * @param Builder $query
-     * @param array $rangeables
-     * @param string $value
-     * @return void
-     * @throws RuntimeException
-     * @throws InvalidArgumentException
-     */
     private function createRangeQuery(Builder $query, Array $rangeables, Array $value)
     {
-        $rangeColumn = array_shift($rangeables);
+        $rangeColumn = array_pop($rangeables);
 
-        if(count($rangeables)) {
+        if (count($rangeables) >= 1) {
 
-            $query->whereHas($rangeColumn, function($_query) use ($rangeables, $value) {
+            $query->leftJoinRelationship(implode('.', $rangeables));
 
-                $this->createRangeQuery($_query, $rangeables, $value);
-            });
+            $relationshipTable = array_pop($rangeables);
 
-        } else {
+            $tableName = $this->$relationshipTable()->getRelated()->getTable();
 
-            $query->whereBetween($rangeColumn, $value);
+            return $query->whereBetween("$tableName.$rangeColumn", $value);
+
+        }
+
+        else {
+
+            $tableName = $this->getTable();
+
+            return $query->whereBetween("$tableName.$rangeColumn", $value);
         }
     }
 }
