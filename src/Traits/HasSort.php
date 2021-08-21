@@ -9,9 +9,9 @@ use Illuminate\Database\Eloquent\Builder;
 
 trait HasSort
 {
-    protected $hasSortRelationshipDriver = 'PowerJoins';
-
     use PowerJoins;
+
+    protected $sortConfig = 'sort';
 
     /**
      * Initialize sorts
@@ -36,8 +36,9 @@ trait HasSort
 
             if (in_array($sortable, array_keys($sort))) {
 
-                $this->createPowerJoinSortQuery($query, $sortable, $sort);
+                $sortables = explode('.', $sortable);
 
+                $this->createPowerJoinSortQuery($query, $sortables, $sort);
             }
         }
     }
@@ -50,9 +51,9 @@ trait HasSort
      * @return void
      * @throws InvalidArgumentException
      */
-    public function createPowerJoinSortQuery(Builder $query, $sortable, $sort)
+    public function createPowerJoinSortQuery(Builder $query, array $sortables, array $sort)
     {
-        $sortables = explode('.', $sortable);
+        $sortable = implode('.', $sortables);
 
         $sortColumn = array_pop($sortables);
 
