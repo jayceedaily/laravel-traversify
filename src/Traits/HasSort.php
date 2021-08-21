@@ -24,7 +24,7 @@ trait HasSort
      */
     public function scopeSort(Builder $query, Array $sort = [])
     {
-        if(!$this->traversify || ($this->traversify && !$sorts = $this->traversify['sort'])) {
+        if(!$sorts = $this->sort) {
             throw new Exception("No column configured to be sorted");
         }
 
@@ -36,29 +36,43 @@ trait HasSort
 
             if (in_array($sortable, array_keys($sort))) {
 
-                $sortables = explode('.', $sortable);
+                $this->createPowerJoinSortQuery($query, $sortable, $sort);
 
-                $sortColumn = array_pop($sortables);
-
-                if (count($sortables) >= 1) {
-
-                    $query->leftJoinRelationship(implode('.', $sortables));
-
-                    $relationshipTable = array_pop($sortables);
-
-                    $tableName = $this->$relationshipTable()->getRelated()->getTable();
-
-                    $query->orderBy("$tableName.$sortColumn", $sort[$sortable]);
-
-                }
-
-                else {
-
-                    $tableName = $this->getTable();
-
-                    $query->orderBy("$tableName.$sortColumn", $sort[$sortable]);
-                }
             }
+        }
+    }
+
+    /**
+     *
+     * @param Builder $query
+     * @param mixed $sortable
+     * @param mixed $sort
+     * @return void
+     * @throws InvalidArgumentException
+     */
+    public function createPowerJoinSortQuery(Builder $query, $sortable, $sort)
+    {
+        $sortables = explode('.', $sortable);
+
+        $sortColumn = array_pop($sortables);
+
+        if (count($sortables) >= 1) {
+
+            $query->leftJoinRelationship(implode('.', $sortables));
+
+            $relationshipTable = array_pop($sortables);
+
+            $tableName = $this->$relationshipTable()->getRelated()->getTable();
+
+            $query->orderBy("$tableName.$sortColumn", $sort[$sortable]);
+
+        }
+
+        else {
+
+            $tableName = $this->getTable();
+
+            $query->orderBy("$tableName.$sortColumn", $sort[$sortable]);
         }
     }
 }
