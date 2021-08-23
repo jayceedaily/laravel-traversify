@@ -10,7 +10,7 @@ trait HasAutoload
 {
     public function scopeAutoload(Builder $query, Array $load = [])
     {
-        if (!$this->traversify || ($this->traversify && ! $autoloads = $this->traversify['autoload'])) {
+        if (!$autoloads = $this->autoload) {
             throw new Exception('No column configured to be autoloaded');
         }
 
