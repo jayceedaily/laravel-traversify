@@ -10,11 +10,28 @@ Install via composer using ``composer require jayceedaily/laravel-traversify``
 
 ```php
 use Traversify/Traversify;
+use Traversify/Traversable;
 
 use Eloquent;
 
-class MyClass extends Eloquent {
+class Task extends Eloquent implements Traversable {
 	use Traversify;
+
+    // Configure the fields to be searched
+    protected $search = [
+        'name', 'description'
+    ];
+
+    // Configure the fields to be sorted
+    protected $sort = [
+        'created_at', 'name', 'completed_at'
+    ];
+
+    // Configure the fields to be filtered
+    protected $filter = [
+        'type_id', 'status'
+    ];
+    
 }
 
 ```
