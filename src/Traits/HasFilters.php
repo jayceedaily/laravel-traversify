@@ -19,7 +19,7 @@ trait HasFilters
      */
     public function scopeFilter(Builder $query, Array $filter = [])
     {
-        if (!$this->traversify || ($this->traversify && !$filters = $this->traversify['filters'])) {
+        if (!$filters = $this->filters) {
             throw new Exception('No column configured to be filtered');
         }
 
@@ -56,20 +56,25 @@ trait HasFilters
      * @throws RuntimeException
      * @throws InvalidArgumentException
      */
-    private function createFilterQuery(Builder $query, Array $filterables, String $value)
+    private function createFilterQuery(Builder $query, Array $filterable, String $value)
     {
-        $filterColumn = array_shift($filterables);
+        $filterColumn = array_pop($filterable);
 
-        if(count($filterables)) {
+        if (count($filterable)) {
 
-            $query->whereHas($filterColumn, function($_query) use ($filterables, $value) {
+            $query->leftJoinRelationship(implode('.',$filterable));
 
-                $this->createFilterQuery($_query, $filterables, $value);
-            });
+            $relationshipTable = array_pop($filterable);
+
+            $tableName = $this->$relationshipTable()->getRelated()->getTable();
+
+            $query->where("$tableName.$filterColumn", $value);
 
         } else {
 
-            $query->where($filterColumn, $value);
+            $tableName = $this->getTable();
+
+            $query->where("$tableName.$filterColumn", $value);
         }
     }
 }
