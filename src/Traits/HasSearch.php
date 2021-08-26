@@ -40,54 +40,34 @@ trait HasSearch
             $this->like = 'ILIKE';
         }
 
-        // TODO The scope where query is cancelling powerjoi queries
-        // $query->where(function($query) use($searches, $keyword){
+        $columns = [];
 
-            foreach($searches as $searchable) {
+        foreach($searches as $searchable) {
 
-                $this->createPowerJoinSearchQuery($query, $searchable, $keyword);
+            $searchables = explode('.', $searchable);
 
-            }
-        // });
+            $searchColumn = array_pop($searchables);
 
-    }
+            if (count($searchables)) {
 
-    private function createPowerJoinSearchQuery(Builder $query, String $searchable, String $keyword)
-    {
-        $searchables = explode('.', $searchable);
+                $query->leftJoinRelationship(implode('.',$searchables));
 
-        $searchColumn = array_pop($searchables);
+                $relationshipTable = array_pop($searchables);
 
-        if (count($searchables)) {
+                $tableName = $this->$relationshipTable()->getRelated()->getTable();
 
+                array_push($columns, "$tableName.$searchColumn");
 
-            $query->leftJoinRelationship(implode('.',$searchables));
+            } else {
 
-            $relationshipTable = array_pop($searchables);
+                $tableName = $this->getTable();
 
-
-            $tableName = $this->$relationshipTable()->getRelated()->getTable();
-
-            $keywords = explode(" ", $keyword);
-
-            foreach ($keywords as $_keyword) {
-
-                $query->orWhere("$tableName.$searchColumn", $this->like, "%$_keyword%" );
-
-            }
-
-        } else {
-
-            $tableName = $this->getTable();
-
-            $keywords = explode(" ", $keyword);
-
-            foreach ($keywords as $_keyword) {
-                $query->orWhere("$tableName.$searchColumn", $this->like, "%$_keyword%" );
-
+                array_push($columns, "$tableName.$searchColumn");
             }
         }
 
-        $query;
+        $columns = implode(', ', $columns);
+
+        return $query->whereRaw("CONCAT_WS(' ', {$columns}) {$this->like} ?", "%{$keyword}%");
     }
 }
