@@ -29,6 +29,12 @@ trait Traversify
 
     public static function traverse(Builder $query, $request)
     {
+        if( $request->has('trashed') &&
+            $request->trashed == 1) {
+
+            $query->onlyTrashed();
+        }
+
         if( $request->has('search') &&
             is_string($request->search)) {
 
