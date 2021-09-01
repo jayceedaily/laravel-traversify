@@ -8,6 +8,7 @@ use Traversify\Traits\HasSearch;
 use Traversify\Traits\HasFilters;
 use Traversify\Traits\HasAutoload;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 trait Traversify
 {
@@ -29,7 +30,8 @@ trait Traversify
 
     public static function traverse(Builder $query, $request)
     {
-        if( $request->has('trashed') &&
+        if( in_array(SoftDeletes::class, class_uses_recursive(self::class)) &&
+            $request->has('trashed') &&
             $request->trashed == 1) {
 
             $query->onlyTrashed();
