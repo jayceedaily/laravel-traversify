@@ -34,7 +34,7 @@ trait HasSort
 
         foreach($sorts as $sortable) {
 
-            if (in_array($sortable, array_keys($sort))) {
+            if (in_array($sortable, array_keys($sort)) && in_array(strtoupper($sort[$sortable]), ['ASC', 'DESC'])) {
 
                 $sortables = explode('.', $sortable);
 
