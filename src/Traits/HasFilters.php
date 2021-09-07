@@ -33,15 +33,9 @@ trait HasFilters
 
                 $filterables = explode('.', $filterable);
 
-                if ($this->hasSortRelationshipDriver == 'PowerJoin') {
+                $value = is_array($filter[$filterable]) ? $filter[$filterable] : [$filter[$filterable]];
 
-                    throw new Exception('PowerJoin has not been implemented');
-
-                } else {
-
-                    $this->createFilterQuery($query, $filterables, $filter[$filterable]);
-
-                }
+                $this->createFilterQuery($query, $filterables, $value);
             }
         }
     }
@@ -56,7 +50,7 @@ trait HasFilters
      * @throws RuntimeException
      * @throws InvalidArgumentException
      */
-    private function createFilterQuery(Builder $query, Array $filterable, String $value)
+    private function createFilterQuery(Builder $query, Array $filterable, Array $value)
     {
         $filterColumn = array_pop($filterable);
 
@@ -68,13 +62,13 @@ trait HasFilters
 
             $tableName = $this->$relationshipTable()->getRelated()->getTable();
 
-            $query->where("$tableName.$filterColumn", $value);
+            $query->whereIn("$tableName.$filterColumn", $value);
 
         } else {
 
             $tableName = $this->getTable();
 
-            $query->where("$tableName.$filterColumn", $value);
+            $query->whereIn("$tableName.$filterColumn", $value);
         }
     }
 }
