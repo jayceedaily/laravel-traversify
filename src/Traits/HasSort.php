@@ -3,6 +3,7 @@ namespace Traversify\Traits;
 
 use Exception;
 use RuntimeException;
+use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Kirschbaum\PowerJoins\PowerJoins;
 use Illuminate\Database\Eloquent\Builder;
@@ -59,17 +60,15 @@ trait HasSort
 
         if (count($sortables) >= 1) {
 
-            // Old version
-            // $query->leftJoinRelationship(implode('.', $sortables));
+            $alias = Str::camel(implode(' ', $sortables));
 
-            // Aliased self reference
-            $query->leftJoinRelationship(implode('.', $sortables), implode('.', $sortables));
+            $query->leftJoinRelationship(implode('.', $sortables), $alias);
 
             $relationshipTable = array_pop($sortables);
 
             $tableName = $this->$relationshipTable()->getRelated()->getTable();
 
-            $query->orderBy("$tableName.$sortColumn", $sort[$sortable]);
+            $query->orderBy("$alias.$sortColumn", $sort[$sortable]);
 
         }
 
