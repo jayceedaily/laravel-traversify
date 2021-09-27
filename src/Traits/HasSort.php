@@ -63,7 +63,7 @@ trait HasSort
             // $query->leftJoinRelationship(implode('.', $sortables));
 
             // Aliased self reference
-            $query->leftJoinRelationship($sortable, $sortable);
+            $query->leftJoinRelationship(implode('.', $sortables), implode('.', $sortables));
 
             $relationshipTable = array_pop($sortables);
 
