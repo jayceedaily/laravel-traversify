@@ -59,7 +59,11 @@ trait HasSort
 
         if (count($sortables) >= 1) {
 
-            $query->leftJoinRelationship(implode('.', $sortables));
+            // Old version
+            // $query->leftJoinRelationship(implode('.', $sortables));
+
+            // Aliased self reference
+            $query->leftJoinRelationship($sortable, $sortable);
 
             $relationshipTable = array_pop($sortables);
 
