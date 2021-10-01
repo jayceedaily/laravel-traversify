@@ -3,6 +3,7 @@ namespace Traversify\Traits;
 
 use Exception;
 use RuntimeException;
+use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Illuminate\Support\Facades\Log;
 use Kirschbaum\PowerJoins\PowerJoins;
@@ -13,6 +14,15 @@ trait HasSearch
     use PowerJoins;
 
     protected $like = 'LIKE';
+
+    /**
+     * List of tables already joined
+     * on runtime. Referenced by operations
+     * to avoid duplicate joining.
+     *
+     * @var array
+     */
+    private $joined = [];
 
     /**
      * Initialize search query
@@ -42,19 +52,31 @@ trait HasSearch
 
         $columns = [];
 
+
         foreach($searches as $searchable) {
 
             $searchables = explode('.', $searchable);
 
+
             $searchColumn = array_pop($searchables);
+
 
             if (count($searchables)) {
 
-                $query->leftJoinRelationship(implode('.',$searchables));
+                if(empty(array_intersect($this->joined, $searchables))) {
 
-                $relationshipTable = array_pop($searchables);
+                    $query->leftJoinRelationship(implode('.', $searchables));
 
-                $tableName = $this->$relationshipTable()->getRelated()->getTable();
+                    $this->joined = array_merge($this->joined, $searchables);
+                }
+
+                $model = new self;
+
+                foreach($searchables as $relationship) {
+                    $model = $model->$relationship()->getRelated();
+                }
+
+                $tableName = $model->getTable();
 
                 array_push($columns, "$tableName.$searchColumn");
 
