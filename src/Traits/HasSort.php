@@ -12,7 +12,7 @@ trait HasSort
 {
     use PowerJoins;
 
-    protected $sortConfig = 'sort';
+    private $joined = [];
 
     /**
      * Initialize sorts
@@ -60,16 +60,17 @@ trait HasSort
 
         if (count($sortables) >= 1) {
 
-            $alias = Str::camel(implode(' ', $sortables));
+            $query->leftJoinRelationship(implode('.', $sortables));
 
-            $query->leftJoinRelationship(implode('.', $sortables), $alias);
+            $model = new self;
 
-            $relationshipTable = array_pop($sortables);
+            foreach($sortables as $relationship) {
+                $model = $model->$relationship()->getRelated();
+            }
 
-            $tableName = $this->$relationshipTable()->getRelated()->getTable();
+            $tableName = $model->getTable();
 
-            $query->orderBy("$alias.$sortColumn", $sort[$sortable]);
-
+            $query->orderBy("$tableName.$sortColumn", $sort[$sortable]);
         }
 
         else {
