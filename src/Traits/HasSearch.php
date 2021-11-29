@@ -16,15 +16,6 @@ trait HasSearch
     protected $like = 'LIKE';
 
     /**
-     * List of tables already joined
-     * on runtime. Referenced by operations
-     * to avoid duplicate joining.
-     *
-     * @var array
-     */
-    private $joined = [];
-
-    /**
      * Initialize search query
      *
      * @param Builder $query
@@ -52,23 +43,13 @@ trait HasSearch
 
         $columns = [];
 
-
         foreach($searches as $searchable) {
 
             $searchables = explode('.', $searchable);
 
-
             $searchColumn = array_pop($searchables);
 
-
             if (count($searchables)) {
-
-                if(empty(array_intersect($this->joined, $searchables))) {
-
-                    $query->leftJoinRelationship(implode('.', $searchables));
-
-                    $this->joined = array_merge($this->joined, $searchables);
-                }
 
                 $model = new self;
 
@@ -78,7 +59,16 @@ trait HasSearch
 
                 $tableName = $model->getTable();
 
-                array_push($columns, "$tableName.$searchColumn");
+                $alias = $tableName;
+
+                if(!collect($query->getQuery()->joins)->pluck('table')->contains($tableName)) {
+
+                    $alias = count($searchables) === 1 ? strtolower($searchables[0]) : $tableName;
+
+                    $query->leftJoinRelationship(implode('.', $searchables), $alias);
+                }
+
+                array_push($columns, "$alias.$searchColumn");
 
             } else {
 
