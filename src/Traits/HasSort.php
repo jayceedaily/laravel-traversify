@@ -3,7 +3,6 @@ namespace Traversify\Traits;
 
 use Exception;
 use RuntimeException;
-use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Kirschbaum\PowerJoins\PowerJoins;
 use Illuminate\Database\Eloquent\Builder;
@@ -58,26 +57,33 @@ trait HasSort
 
         $sortColumn = array_pop($sortables);
 
-        if (count($sortables) >= 1) {
+        $keyName = $this->getKeyName();
 
-            $query->leftJoinRelationship(implode('.', $sortables));
+        $model = new self;
 
-            $model = new self;
-
-            foreach($sortables as $relationship) {
-                $model = $model->$relationship()->getRelated();
-            }
-
-            $tableName = $model->getTable();
-
-            $query->orderBy("$tableName.$sortColumn", $sort[$sortable]);
+        foreach($sortables as $relationship) {
+            $model = $model->$relationship()->getRelated();
         }
 
-        else {
+        $keyName = $model->getKeyName();
 
-            $tableName = $this->getTable();
+        $tableName = $model->getTable();
 
-            $query->orderBy("$tableName.$sortColumn", $sort[$sortable]);
+        if (count($sortables) && !collect($query->getQuery()->joins)->pluck('table')->contains($tableName)) {
+
+            $tableName = count($sortables) === 1 ? strtolower($sortables[0]) : $tableName;
+
+            $query->leftJoinRelationship(implode('.', $sortables), $tableName);
         }
+
+        $sortColumnAlias = "sort_column_${tableName}_${sortColumn}";
+
+        if(!$query->getQuery()->columns) {
+            $query->select('*');
+        }
+
+        $query->selectRaw("CONCAT($tableName.$sortColumn, ';',$tableName.$keyName) as $sortColumnAlias");
+
+        $query->orderBy($sortColumnAlias, $sort[$sortable]);
     }
 }
