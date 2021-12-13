@@ -79,7 +79,7 @@ trait HasSort
         $sortColumnAlias = "sort_column_${tableName}_${sortColumn}";
 
         if(!$query->getQuery()->columns) {
-            $query->select('*');
+            $query->select($this->getTable() . '.*');
         }
 
         $query->selectRaw("CONCAT($tableName.$sortColumn, ';',$tableName.$keyName) as $sortColumnAlias");
