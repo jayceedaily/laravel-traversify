@@ -82,8 +82,12 @@ trait HasSort
             $query->select($this->getTable() . '.*');
         }
 
-        $query->selectRaw("CONCAT($tableName.$sortColumn, ';',$tableName.$keyName) as $sortColumnAlias");
+        // $query->selectRaw("CONCAT($tableName.$sortColumn, ';',$tableName.$keyName) as $sortColumnAlias");
+
+        $query->selectRaw("$tableName.$sortColumn as $sortColumnAlias");
 
         $query->orderBy($sortColumnAlias, $sort[$sortable]);
+
+        $query->orderBy( 'id', $sort[$sortable]);
     }
 }
